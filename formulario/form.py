@@ -11,11 +11,11 @@ class SistemaBrigadasApp(ctk.CTk):
 
         # 1. Configuración de la Ventana
         self.title("SGB - Gestión de Brigadas Maracaibo")
-        self.geometry("1100x650")
+        self.geometry("1100x700")
 
         # Layout Principal: 2 Columnas
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1) # La columna de contenido se expande
+        self.grid_rowconfigure(0, weight=1)    # La fila se expande
 
         # 2. Crear Menú Lateral
         self.crear_menu_lateral()
@@ -23,6 +23,10 @@ class SistemaBrigadasApp(ctk.CTk):
         # 3. Frame Principal (Área de trabajo)
         self.main_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.main_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
+        
+        # Configuración inicial de expansión para el main_frame
+        self.main_frame.grid_columnconfigure(0, weight=1)
+        self.main_frame.grid_rowconfigure(0, weight=1)
 
         # Al iniciar, mostramos el Dashboard directamente
         self.mostrar_dashboard()
@@ -37,12 +41,10 @@ class SistemaBrigadasApp(ctk.CTk):
         lbl_logo.grid(row=0, column=0, padx=20, pady=(20, 30))
 
         # Botones de Navegación (Módulos Principales)
-        # Nota: Se eliminó el botón "Inicio" como pediste.
-
         self.btn_inst = ctk.CTkButton(self.sidebar, text="Instituciones (2.0)", command=self.menu_instituciones)
         self.btn_inst.grid(row=2, column=0, padx=20, pady=10)
 
-        self.btn_usu = ctk.CTkButton(self.sidebar, text="Usuarios (3.0)", command=self.mostrar_usuarios)
+        self.btn_usu = ctk.CTkButton(self.sidebar, text="Usuarios (3.0)", command=self.menu_usuarios)
         self.btn_usu.grid(row=3, column=0, padx=20, pady=10)
 
         self.btn_brig = ctk.CTkButton(self.sidebar, text="Brigadas (4.0)", command=self.mostrar_brigadas)
@@ -55,8 +57,14 @@ class SistemaBrigadasApp(ctk.CTk):
         self.btn_salir.grid(row=9, column=0, padx=20, pady=20)
 
     def limpiar_panel(self):
+        """Elimina widgets y resetea la configuración del grid"""
         for widget in self.main_frame.winfo_children():
             widget.destroy()
+        
+        # Resetear configuración por defecto (Fila 0 expandible)
+        self.main_frame.grid_rowconfigure(0, weight=1)
+        self.main_frame.grid_rowconfigure(1, weight=0) 
+        self.main_frame.grid_columnconfigure(0, weight=1)
 
     # ==========================================
     # 1.0 DASHBOARD (Pantalla de Inicio)
@@ -64,22 +72,23 @@ class SistemaBrigadasApp(ctk.CTk):
     def mostrar_dashboard(self):
         self.limpiar_panel()
         
-        titulo = ctk.CTkLabel(self.main_frame, text="Panel de Estadísticas Generales", font=("Arial", 26, "bold"))
-        titulo.pack(pady=20)
+        # Frame contenedor que se expande
+        content_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        content_frame.grid(row=0, column=0, sticky="nsew")
+        content_frame.grid_columnconfigure((0, 1), weight=1)
         
-        # Contenedor de tarjetas
-        info_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        info_frame.pack(pady=10, fill="x", padx=20)
+        titulo = ctk.CTkLabel(content_frame, text="Panel de Estadísticas Generales", font=("Arial", 26, "bold"))
+        titulo.grid(row=0, column=0, columnspan=2, pady=20)
         
         # Tarjeta 1
-        card1 = ctk.CTkFrame(info_frame, height=150, fg_color="white")
-        card1.pack(side="left", fill="both", expand=True, padx=10)
+        card1 = ctk.CTkFrame(content_frame, height=150, fg_color="white")
+        card1.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
         ctk.CTkLabel(card1, text="Total Brigadas", font=("Arial", 14)).pack(pady=(20,5))
         ctk.CTkLabel(card1, text="12", font=("Arial", 40, "bold"), text_color="#2980b9").pack(pady=10)
         
         # Tarjeta 2
-        card2 = ctk.CTkFrame(info_frame, height=150, fg_color="white")
-        card2.pack(side="left", fill="both", expand=True, padx=10)
+        card2 = ctk.CTkFrame(content_frame, height=150, fg_color="white")
+        card2.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
         ctk.CTkLabel(card2, text="Actividades Pendientes", font=("Arial", 14)).pack(pady=(20,5))
         ctk.CTkLabel(card2, text="5", font=("Arial", 40, "bold"), text_color="#e67e22").pack(pady=10)
 
@@ -87,46 +96,53 @@ class SistemaBrigadasApp(ctk.CTk):
     # 2.0 MÓDULO INSTITUCIONES
     # ==========================================
     def menu_instituciones(self):
-        """Pantalla con Grilla 2x2 de Opciones"""
         self.limpiar_panel()
+        # Aquí usamos Fila 0 con Weight 1 (Configuración por defecto de limpiar_panel)
 
-        titulo = ctk.CTkLabel(self.main_frame, text="Gestión de Instituciones (2.0)", font=("Arial", 24, "bold"))
-        titulo.pack(pady=(10, 30))
-
-        # Frame para la grilla 2x2
         grid_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        grid_frame.pack(expand=True)
+        grid_frame.grid(row=0, column=0, sticky="nsew")
+        
+        grid_frame.grid_columnconfigure(0, weight=1)
+        grid_frame.grid_columnconfigure(1, weight=1)
+        grid_frame.grid_rowconfigure(0, weight=0) # Título fijo
+        grid_frame.grid_rowconfigure(1, weight=1) # Botones expandibles
+        grid_frame.grid_rowconfigure(2, weight=1) # Botones expandibles
 
-        # Botón 1: Registrar
-        btn_reg = ctk.CTkButton(grid_frame, text="REGISTRAR\nNueva Institución", width=200, height=100,
+        titulo = ctk.CTkLabel(grid_frame, text="Gestión de Instituciones (2.0)", font=("Arial", 24, "bold"))
+        titulo.grid(row=0, column=0, columnspan=2, pady=(10, 30))
+
+        btn_reg = ctk.CTkButton(grid_frame, text="REGISTRAR\nNueva Institución",
                                 font=("Arial", 16, "bold"), command=self.form_inst_registrar)
-        btn_reg.grid(row=0, column=0, padx=20, pady=20)
+        btn_reg.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
 
-        # Botón 2: Modificar
-        btn_mod = ctk.CTkButton(grid_frame, text="MODIFICAR\nDatos Existentes", width=200, height=100,
+        btn_mod = ctk.CTkButton(grid_frame, text="MODIFICAR\nDatos Existentes",
                                 font=("Arial", 16, "bold"), fg_color="#f39c12", hover_color="#d35400",
                                 command=self.form_inst_modificar)
-        btn_mod.grid(row=0, column=1, padx=20, pady=20)
+        btn_mod.grid(row=1, column=1, padx=20, pady=20, sticky="nsew")
 
-        # Botón 3: Consultar
-        btn_con = ctk.CTkButton(grid_frame, text="CONSULTAR\nListado General", width=200, height=100,
+        btn_con = ctk.CTkButton(grid_frame, text="CONSULTAR\nListado General",
                                 font=("Arial", 16, "bold"), fg_color="#27ae60", hover_color="#2ecc71",
                                 command=self.form_inst_consultar)
-        btn_con.grid(row=1, column=0, padx=20, pady=20)
+        btn_con.grid(row=2, column=0, padx=20, pady=20, sticky="nsew")
 
-        # Botón 4: Eliminar
-        btn_eli = ctk.CTkButton(grid_frame, text="ELIMINAR\nInstitución", width=200, height=100,
+        btn_eli = ctk.CTkButton(grid_frame, text="ELIMINAR\nInstitución",
                                 font=("Arial", 16, "bold"), fg_color="#c0392b", hover_color="#e74c3c",
                                 command=self.form_inst_eliminar)
-        btn_eli.grid(row=1, column=1, padx=20, pady=20)
+        btn_eli.grid(row=2, column=1, padx=20, pady=20, sticky="nsew")
 
     # --- 2.1 Formulario REGISTRAR Institución ---
     def form_inst_registrar(self):
         self.limpiar_panel()
         
-        # Cabecera con botón volver
+        # CORRECCIÓN DE EXPANSIÓN:
+        # Fila 0 (Header) = Weight 0 (Fijo)
+        # Fila 1 (Formulario) = Weight 1 (Expande)
+        self.main_frame.grid_rowconfigure(0, weight=0)
+        self.main_frame.grid_rowconfigure(1, weight=1)
+
+        # Header
         header_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        header_frame.pack(fill="x", padx=20, pady=10)
+        header_frame.grid(row=0, column=0, sticky="ew", padx=20, pady=10)
         
         btn_volver = ctk.CTkButton(header_frame, text="< Volver", width=60, fg_color="gray", command=self.menu_instituciones)
         btn_volver.pack(side="left")
@@ -135,7 +151,7 @@ class SistemaBrigadasApp(ctk.CTk):
 
         # Formulario
         form_frame = ctk.CTkFrame(self.main_frame)
-        form_frame.pack(pady=10, padx=40, fill="both", expand=True)
+        form_frame.grid(row=1, column=0, sticky="nsew", padx=40, pady=10)
 
         ctk.CTkLabel(form_frame, text="Nombre de la Institución:", anchor="w").pack(fill="x", padx=20, pady=(20, 5))
         self.entry_inst_nombre = ctk.CTkEntry(form_frame, placeholder_text="Ej: U.E. Rafael Belloso Chacín")
@@ -152,61 +168,183 @@ class SistemaBrigadasApp(ctk.CTk):
         ctk.CTkButton(form_frame, text="Guardar en Base de Datos", height=40, font=("Arial", 14, "bold"), 
                       command=self.guardar_institucion_mock).pack(pady=30)
 
-    # --- 2.2 Formulario MODIFICAR Institución ---
+    # --- Placeholders 2.x ---
     def form_inst_modificar(self):
         self.limpiar_panel()
-        # Header
+        self.main_frame.grid_rowconfigure(0, weight=0)
+        self.main_frame.grid_rowconfigure(1, weight=1)
+
         header_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        header_frame.pack(fill="x", padx=20, pady=10)
+        header_frame.grid(row=0, column=0, sticky="ew", padx=20, pady=10)
         ctk.CTkButton(header_frame, text="< Volver", width=60, fg_color="gray", command=self.menu_instituciones).pack(side="left")
         ctk.CTkLabel(header_frame, text="Modificar Institución", font=("Arial", 20, "bold")).pack(side="left", padx=20)
         
-        # Placeholder del formulario
-        ctk.CTkLabel(self.main_frame, text="Aquí iría el buscador para seleccionar la institución a editar", text_color="gray").pack(pady=50)
+        ctk.CTkLabel(self.main_frame, text="Aquí iría el buscador...", text_color="gray").grid(row=1, column=0)
 
-    # --- 2.3 Formulario CONSULTAR Institución ---
     def form_inst_consultar(self):
         self.limpiar_panel()
+        self.main_frame.grid_rowconfigure(0, weight=0)
+        self.main_frame.grid_rowconfigure(1, weight=1)
+        
         header_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        header_frame.pack(fill="x", padx=20, pady=10)
+        header_frame.grid(row=0, column=0, sticky="ew", padx=20, pady=10)
         ctk.CTkButton(header_frame, text="< Volver", width=60, fg_color="gray", command=self.menu_instituciones).pack(side="left")
         ctk.CTkLabel(header_frame, text="Listado de Instituciones", font=("Arial", 20, "bold")).pack(side="left", padx=20)
         
-        ctk.CTkLabel(self.main_frame, text="Aquí se mostrará la Tabla con todas las instituciones", text_color="gray").pack(pady=50)
+        ctk.CTkLabel(self.main_frame, text="Tabla de Consulta", text_color="gray").grid(row=1, column=0)
 
-    # --- 2.4 Formulario ELIMINAR Institución ---
     def form_inst_eliminar(self):
         self.limpiar_panel()
+        self.main_frame.grid_rowconfigure(0, weight=0)
+        self.main_frame.grid_rowconfigure(1, weight=1)
+        
         header_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        header_frame.pack(fill="x", padx=20, pady=10)
+        header_frame.grid(row=0, column=0, sticky="ew", padx=20, pady=10)
         ctk.CTkButton(header_frame, text="< Volver", width=60, fg_color="gray", command=self.menu_instituciones).pack(side="left")
         ctk.CTkLabel(header_frame, text="Eliminar Institución", font=("Arial", 20, "bold"), text_color="#c0392b").pack(side="left", padx=20)
         
-        ctk.CTkLabel(self.main_frame, text="Cuidado: Zona de eliminación de registros", text_color="gray").pack(pady=50)
+        ctk.CTkLabel(self.main_frame, text="Zona de Eliminación", text_color="gray").grid(row=1, column=0)
+
+    # ==========================================
+    # 3.0 MÓDULO USUARIOS
+    # ==========================================
+    def menu_usuarios(self):
+        self.limpiar_panel()
+        # Fila 0 expande (por defecto)
+
+        grid_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        grid_frame.grid(row=0, column=0, sticky="nsew")
+        
+        grid_frame.grid_columnconfigure(0, weight=1)
+        grid_frame.grid_columnconfigure(1, weight=1)
+        grid_frame.grid_rowconfigure(0, weight=0) 
+        grid_frame.grid_rowconfigure(1, weight=1)
+        grid_frame.grid_rowconfigure(2, weight=1) 
+
+        titulo = ctk.CTkLabel(grid_frame, text="Gestión de Usuarios (3.0)", font=("Arial", 24, "bold"))
+        titulo.grid(row=0, column=0, columnspan=2, pady=(10, 30))
+
+        btn_reg = ctk.CTkButton(grid_frame, text="REGISTRAR\nNuevo Usuario",
+                                font=("Arial", 16, "bold"), command=self.form_usu_registrar)
+        btn_reg.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
+
+        btn_mod = ctk.CTkButton(grid_frame, text="MODIFICAR\nUsuario",
+                                font=("Arial", 16, "bold"), fg_color="#f39c12", hover_color="#d35400",
+                                command=self.form_usu_modificar)
+        btn_mod.grid(row=1, column=1, padx=20, pady=20, sticky="nsew")
+
+        btn_con = ctk.CTkButton(grid_frame, text="CONSULTAR\nDirectorio de Usuarios",
+                                font=("Arial", 16, "bold"), fg_color="#27ae60", hover_color="#2ecc71",
+                                command=self.form_usu_consultar)
+        btn_con.grid(row=2, column=0, padx=20, pady=20, sticky="nsew")
+
+        btn_eli = ctk.CTkButton(grid_frame, text="ELIMINAR\nUsuario",
+                                font=("Arial", 16, "bold"), fg_color="#c0392b", hover_color="#e74c3c",
+                                command=self.form_usu_eliminar)
+        btn_eli.grid(row=2, column=1, padx=20, pady=20, sticky="nsew")
+
+    # --- 3.1 Formulario REGISTRAR Usuario ---
+    def form_usu_registrar(self):
+        self.limpiar_panel()
+        # CORRECCIÓN DE EXPANSIÓN
+        self.main_frame.grid_rowconfigure(0, weight=0)
+        self.main_frame.grid_rowconfigure(1, weight=1)
+        
+        header_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        header_frame.grid(row=0, column=0, sticky="ew", padx=20, pady=10)
+        
+        btn_volver = ctk.CTkButton(header_frame, text="< Volver", width=60, fg_color="gray", command=self.menu_usuarios)
+        btn_volver.pack(side="left")
+        
+        ctk.CTkLabel(header_frame, text="Registrar Nuevo Usuario", font=("Arial", 20, "bold")).pack(side="left", padx=20)
+
+        form_frame = ctk.CTkScrollableFrame(self.main_frame)
+        form_frame.grid(row=1, column=0, sticky="nsew", padx=40, pady=10)
+
+        # Campos
+        ctk.CTkLabel(form_frame, text="Nombres:", anchor="w").pack(fill="x", padx=20, pady=(10, 2))
+        self.entry_usu_nombre = ctk.CTkEntry(form_frame, placeholder_text="Ej: Juan Antonio")
+        self.entry_usu_nombre.pack(fill="x", padx=20, pady=5)
+
+        ctk.CTkLabel(form_frame, text="Apellidos:", anchor="w").pack(fill="x", padx=20, pady=(10, 2))
+        self.entry_usu_apellido = ctk.CTkEntry(form_frame, placeholder_text="Ej: Pérez Rodríguez")
+        self.entry_usu_apellido.pack(fill="x", padx=20, pady=5)
+
+        ctk.CTkLabel(form_frame, text="Correo Electrónico:", anchor="w").pack(fill="x", padx=20, pady=(10, 2))
+        self.entry_usu_correo = ctk.CTkEntry(form_frame, placeholder_text="Ej: usuario@brigadas.com")
+        self.entry_usu_correo.pack(fill="x", padx=20, pady=5)
+
+        ctk.CTkLabel(form_frame, text="Teléfono:", anchor="w").pack(fill="x", padx=20, pady=(10, 2))
+        self.entry_usu_telefono = ctk.CTkEntry(form_frame, placeholder_text="Ej: 0412-1234567")
+        self.entry_usu_telefono.pack(fill="x", padx=20, pady=5)
+
+        ctk.CTkLabel(form_frame, text="Dirección de Habitación:", anchor="w").pack(fill="x", padx=20, pady=(10, 2))
+        self.entry_usu_direccion = ctk.CTkEntry(form_frame, placeholder_text="Sector, Calle, Nº de Casa")
+        self.entry_usu_direccion.pack(fill="x", padx=20, pady=5)
+
+        ctk.CTkLabel(form_frame, text="Rol en el Sistema:", anchor="w").pack(fill="x", padx=20, pady=(10, 2))
+        self.combo_usu_rol = ctk.CTkComboBox(form_frame, values=["Brigadista", "Profesor", "Coordinador", "Administrador"])
+        self.combo_usu_rol.pack(fill="x", padx=20, pady=5)
+
+        ctk.CTkButton(form_frame, text="Registrar Usuario", height=40, font=("Arial", 14, "bold"), 
+                      command=self.guardar_usuario_mock).pack(pady=30)
+
+    # --- Placeholders 3.x ---
+    def form_usu_modificar(self):
+        self.limpiar_panel()
+        self.main_frame.grid_rowconfigure(0, weight=0)
+        self.main_frame.grid_rowconfigure(1, weight=1)
+        header = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        header.grid(row=0, column=0, sticky="ew", padx=20, pady=10)
+        ctk.CTkButton(header, text="< Volver", width=60, fg_color="gray", command=self.menu_usuarios).pack(side="left")
+        ctk.CTkLabel(self.main_frame, text="Modificar Usuario", text_color="gray").grid(row=1, column=0)
+
+    def form_usu_consultar(self):
+        self.limpiar_panel()
+        self.main_frame.grid_rowconfigure(0, weight=0)
+        self.main_frame.grid_rowconfigure(1, weight=1)
+        header = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        header.grid(row=0, column=0, sticky="ew", padx=20, pady=10)
+        ctk.CTkButton(header, text="< Volver", width=60, fg_color="gray", command=self.menu_usuarios).pack(side="left")
+        ctk.CTkLabel(self.main_frame, text="Tabla Usuarios", text_color="gray").grid(row=1, column=0)
+
+    def form_usu_eliminar(self):
+        self.limpiar_panel()
+        self.main_frame.grid_rowconfigure(0, weight=0)
+        self.main_frame.grid_rowconfigure(1, weight=1)
+        header = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        header.grid(row=0, column=0, sticky="ew", padx=20, pady=10)
+        ctk.CTkButton(header, text="< Volver", width=60, fg_color="gray", command=self.menu_usuarios).pack(side="left")
+        ctk.CTkLabel(self.main_frame, text="Eliminar Usuario", text_color="red").grid(row=1, column=0)
 
     # ==========================================
     # OTROS MÓDULOS (Placeholders)
     # ==========================================
-    def mostrar_usuarios(self):
-        self.limpiar_panel()
-        ctk.CTkLabel(self.main_frame, text="Módulo Usuarios (En construcción)", font=("Arial", 20)).pack(pady=50)
-
     def mostrar_brigadas(self):
         self.limpiar_panel()
-        ctk.CTkLabel(self.main_frame, text="Módulo Brigadas (En construcción)", font=("Arial", 20)).pack(pady=50)
+        ctk.CTkLabel(self.main_frame, text="Módulo Brigadas (En construcción)", font=("Arial", 20)).grid(row=0, column=0)
 
     def mostrar_actividades(self):
         self.limpiar_panel()
-        ctk.CTkLabel(self.main_frame, text="Módulo Actividades (En construcción)", font=("Arial", 20)).pack(pady=50)
+        ctk.CTkLabel(self.main_frame, text="Módulo Actividades (En construcción)", font=("Arial", 20)).grid(row=0, column=0)
 
     # --- LÓGICA MOCK ---
     def guardar_institucion_mock(self):
         nombre = self.entry_inst_nombre.get()
         if nombre:
             messagebox.showinfo("Éxito", f"Institución '{nombre}' guardada correctamente.")
-            self.menu_instituciones() # Volver al menú después de guardar
+            self.menu_instituciones()
         else:
             messagebox.showwarning("Error", "El campo nombre es obligatorio")
+
+    def guardar_usuario_mock(self):
+        nombre = self.entry_usu_nombre.get()
+        rol = self.combo_usu_rol.get()
+        if nombre:
+            messagebox.showinfo("Usuario Registrado", f"El usuario {nombre} ha sido registrado como {rol}.")
+            self.menu_usuarios()
+        else:
+            messagebox.showwarning("Error", "El nombre es obligatorio")
 
     def salir(self):
         resp = messagebox.askyesno("Salir", "¿Desea cerrar el sistema?")
